@@ -65,6 +65,10 @@ a {
   color: #6b7486;
 }
 
+.user-links .user-link {
+  color: inherit;
+}
+
 .primary-btn {
   background: #28346a;
   color: #fff;
@@ -643,6 +647,258 @@ a {
 
 .auth-card .primary-btn {
   min-width: 100px;
+}
+
+/* Review screen */
+.review-wrap {
+  padding: 18px 22px 32px;
+  display: flex;
+  justify-content: center;
+}
+
+.review-card {
+  background: #fff;
+  border: 1px solid #e1e6ef;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(29, 40, 61, 0.06);
+  width: 100%;
+  max-width: 1100px;
+  padding: 28px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-title {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #2f3543;
+}
+
+.review-body {
+  border: 1px solid #e5e8ef;
+  border-radius: 8px;
+  padding: 16px 18px;
+  color: #2f3543;
+  font-size: 14px;
+  line-height: 1.6;
+  background: #fff;
+  flex: 1;
+}
+
+.review-body p {
+  margin: 4px 0;
+}
+
+.review-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.decline-btn {
+  background: #9c2f2f;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(156, 47, 47, 0.2);
+}
+
+.report-wrap {
+  padding: 18px 22px 32px;
+}
+
+.report-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.pdf-btn {
+  background: #28346a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(40, 52, 106, 0.22);
+}
+
+.report-card {
+  background: #fff;
+  border: 1px solid #e1e6ef;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(29, 40, 61, 0.06);
+  width: 100%;
+  padding: 28px 32px;
+}
+
+.report-title {
+  text-align: center;
+  margin: 0 0 18px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #2f3543;
+}
+
+.report-body {
+  padding: 6px 8px;
+  color: #4a4f5a;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* User hub */
+.user-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 16px;
+  padding: 18px 22px 32px;
+  min-height: calc(100vh - 70px);
+  align-items: stretch;
+}
+
+.user-sidebar {
+  background: #f4f6fb;
+  border: 1px solid #e4e8f0;
+  border-radius: 10px;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.user-tab {
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #8b94a5;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.user-tab-active {
+  background: #fff;
+  color: #1f2a44;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+.user-content {
+  background: #fff;
+  border: 1px solid #e1e6ef;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(29, 40, 61, 0.06);
+  padding: 16px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 70vh;
+}
+
+.user-filters {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.user-filters label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2f3543;
+}
+
+.user-filters input {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #d9dfe7;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.user-filters select {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #d9dfe7;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fff;
+}
+
+.filter-btn {
+  height: 34px;
+  padding: 0 12px;
+}
+
+.user-table {
+  border: 1px solid #e3e7ef;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.user-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.user-table thead {
+  background: #eef1f6;
+  color: #4b5566;
+}
+
+.user-table th,
+.user-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #edf0f5;
+  text-align: left;
+}
+
+.file-name-cell {
+  font-style: italic;
+}
+
+.user-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.user-card {
+  border: 1px solid #e4e9f2;
+  border-radius: 10px;
+  padding: 12px 12px 10px;
+  background: #f9fbff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.card-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #2f3543;
+}
+
+.card-body {
+  font-size: 13px;
+  color: #606676;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.card-date {
+  text-align: right;
+  font-size: 12px;
+  color: #4a4f5a;
 }
 
 @media (max-width: 1100px) {

@@ -124,6 +124,6 @@ const removeFile = (name) => {
 };
 
 const goResults = () => {
-  router.push('/results');
+  router.push('/review');
 };
 </script>
