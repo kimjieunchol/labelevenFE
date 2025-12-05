@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="action-row">
-      <router-link to="/results">
+      <router-link to="/report">
         <button class="primary-btn">보고서 확인하기</button>
       </router-link>
     </div>

@@ -6,7 +6,7 @@
     </div>
     <nav class="user-links">
       <a href="#">사용자</a>
-      <a href="#" @click.prevent="handleLogout">로그아웃</a>
+      <a href="#">로그아웃</a>
     </nav>
   </header>
 </template>

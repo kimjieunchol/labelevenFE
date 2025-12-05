@@ -148,39 +148,7 @@ const removeFile = (name) => {
   }
 };
 
-const handleUpload = async () => {
-  if (!selectedFile.value) {
-    alert("파일을 선택해주세요.");
-    return;
-  }
-
-  if (!country.value) {
-    alert("수출국을 선택해주세요.");
-    return;
-  }
-
-  try {
-    console.log("업로드 시작:", {
-      file: selectedFile.value,
-      country: country.value,
-      title: title.value,
-    });
-
-    const formData = new FormData();
-    formData.append("file", selectedFile.value);
-    formData.append("country", country.value);
-    if (title.value) {
-      formData.append("title", title.value);
-    }
-
-    const response = await projectAPI.uploadFile(formData);
-    console.log("업로드 성공:", response);
-    router.push("/results");
-  } catch (error) {
-    console.error("업로드 에러:", error);
-    alert(
-      "파일 업로드에 실패했습니다: " + (error.message || "알 수 없는 오류")
-    );
-  }
+const goResults = () => {
+  router.push("/results");
 };
 </script>
