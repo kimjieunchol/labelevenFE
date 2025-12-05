@@ -1191,7 +1191,7 @@ body {
   scrollbar-width: none; /* Firefox: no gutter */
 }
 
-/* Ensure right panel (panel-wide) scrolls internally */
+/* Ensure right panel (panel-wide) scrolls internally22 */
 .panel-wide {
   flex: 1.15;
   min-height: 0;
