@@ -100,6 +100,66 @@ export const projectAPI = {
   },
 };
 
+// Report API
+export const reportAPI = {
+  createReport: async (data) => {
+    const response = await apiClient.post("/reports", data);
+    return response.data;
+  },
+  getReportStatus: async (id) => {
+    const response = await apiClient.get(`/reports/${id}/status`);
+    return response.data;
+  },
+  getReport: async (id) => {
+    const response = await apiClient.get(`/reports/${id}`);
+    return response.data;
+  },
+  approveReport: async (data) => {
+    const response = await apiClient.post("/reports/approval", data);
+    return response.data;
+  },
+  getReports: async (reportType) => {
+    const response = await apiClient.get("/reports", {
+      params: { reportType },
+    });
+    return response.data;
+  },
+  downloadReport: async (id, format = "PDF") => {
+    const response = await apiClient.get(`/reports/${id}/download`, {
+      params: { format },
+    });
+    return response.data;
+  },
+  deleteReport: async (id) => {
+    const response = await apiClient.delete(`/reports/${id}`);
+    return response.data;
+  },
+};
+
+// Pipeline API
+export const pipelineAPI = {
+  executePipeline: async (data) => {
+    const response = await apiClient.post("/pipelines/execute", data);
+    return response.data;
+  },
+  getPipelineStatus: async (id) => {
+    const response = await apiClient.get(`/pipelines/${id}/status`);
+    return response.data;
+  },
+  getPipelineResult: async (id) => {
+    const response = await apiClient.get(`/pipelines/${id}/result`);
+    return response.data;
+  },
+  stopPipeline: async (id) => {
+    const response = await apiClient.post(`/pipelines/${id}/stop`);
+    return response.data;
+  },
+  reExecutePipeline: async (id) => {
+    const response = await apiClient.post(`/pipelines/${id}/reexecute`);
+    return response.data;
+  },
+};
+
 // User API
 export const userAPI = {
   getCurrentUser: async () => {

@@ -11,91 +11,102 @@
       </div>
     </aside>
     <section class="user-content">
-      <template v-if="activeTab === 'upload-list'">
-        <div class="user-filters">
-          <label>제목 <input v-model="titleInput" type="text" placeholder="제목을 입력하세요" /></label>
-          <label>파일명 <input v-model="fileInput" type="text" placeholder="파일명을 입력하세요" /></label>
-          <label>생성일자 <input v-model="dateInput" type="date" /></label>
-          <button class="primary-btn filter-btn" @click="applyTableFilters">검색</button>
-        </div>
-        <div class="user-table">
-          <table>
-            <thead>
-              <tr>
-                <th>제목</th>
-                <th>파일명</th>
-                <th>용량</th>
-                <th>생성 날짜</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="row in filteredRows" :key="row.id">
-                <td>{{ row.title }}</td>
-                <td class="file-name-cell">{{ row.filename }}</td>
-                <td>{{ row.size }}</td>
-                <td>{{ row.date }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </template>
+      <div class="user-filters">
+        <label
+          >제목
+          <input
+            v-model="titleInput"
+            type="text"
+            placeholder="제목을 입력하세요"
+        /></label>
+        <label
+          >파일명
+          <input
+            v-model="fileInput"
+            type="text"
+            placeholder="파일명을 입력하세요"
+        /></label>
+        <label>생성일자 <input v-model="dateInput" type="date" /></label>
+        <button class="primary-btn filter-btn" @click="applyTableFilters">
+          검색
+        </button>
+      </div>
 
-      <template v-else>
-        <div class="user-filters">
-          <label>제목 <input v-model="cardTitleInput" type="text" placeholder="제목을 입력하세요" /></label>
-          <label>수출국
-            <select v-model="countryInput">
-              <option value="">선택</option>
-              <option>유럽</option>
-              <option>미국</option>
-              <option>일본</option>
-              <option>호주</option>
-            </select>
-          </label>
-          <label>생성일자 <input v-model="cardDateInput" type="date" /></label>
-          <button class="primary-btn filter-btn" @click="applyCardFilters">검색</button>
-        </div>
-        <div class="user-cards">
-          <div v-for="card in filteredCards" :key="card.id" class="user-card">
-            <div class="card-title">{{ card.title }}</div>
-            <div class="card-body">{{ card.body }}</div>
-            <div class="card-date">{{ card.date }}</div>
-          </div>
-        </div>
-      </template>
+      <div v-if="loading" class="loading">데이터 로딩 중...</div>
+
+      <div v-else class="user-table">
+        <table>
+          <thead>
+            <tr>
+              <th>제목</th>
+              <th>파일명</th>
+              <th>용량</th>
+              <th>생성 날짜</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in filteredRows" :key="row.id">
+              <td>{{ row.title }}</td>
+              <td class="file-name-cell">{{ row.filename }}</td>
+              <td>{{ row.size }}</td>
+              <td>{{ formatDate(row.date) }}</td>
+              <td>
+                <button class="ghost-btn" @click="viewProject(row.id)">
+                  보기
+                </button>
+                <button class="decline-btn" @click="deleteProject(row.id)">
+                  삭제
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { projectAPI } from "../api/api.js";
 
 const router = useRouter();
+const loading = ref(false);
+const projects = ref([]);
 
 const tabs = [
-  { key: 'upload-list', label: '업로드한 데이터', route: '/user' },
-  { key: 'merge-report', label: '정합 보고서', route: '/user/merge' },
-  { key: 'final-report', label: '최종 보고서', route: '/user/final' },
-  { key: 'raw-data', label: '원본 데이터', route: '/user/raw' },
+  { key: "upload-list", label: "업로드한 데이터", route: "/user" },
+  { key: "merge-report", label: "정합 보고서", route: "/user/merge" },
+  { key: "final-report", label: "최종 보고서", route: "/user/final" },
+  { key: "raw-data", label: "원본 데이터", route: "/user/raw" },
 ];
 
-const activeTab = ref('upload-list');
+const activeTab = ref("upload-list");
 
-const resetFilters = () => {
-  titleInput.value = '';
-  fileInput.value = '';
-  dateInput.value = '';
-  appliedTitle.value = '';
-  appliedFile.value = '';
-  appliedDate.value = '';
+const titleInput = ref("");
+const fileInput = ref("");
+const dateInput = ref("");
+const appliedTitle = ref("");
+const appliedFile = ref("");
+const appliedDate = ref("");
 
-  cardTitleInput.value = '';
-  cardDateInput.value = '';
-  countryInput.value = '';
-  appliedCardTitle.value = '';
-  appliedCardDate.value = '';
-  appliedCountry.value = '';
+onMounted(async () => {
+  await loadProjects();
+});
+
+const loadProjects = async () => {
+  try {
+    loading.value = true;
+    const response = await projectAPI.getProjects();
+    projects.value = response.data?.projects || [];
+  } catch (error) {
+    console.error("프로젝트 로딩 실패:", error);
+    alert("데이터를 불러오는데 실패했습니다.");
+  } finally {
+    loading.value = false;
+  }
 };
 
 const switchTab = (key) => {
@@ -107,30 +118,14 @@ const switchTab = (key) => {
   resetFilters();
 };
 
-const tableRows = Array.from({ length: 18 }).map((_, idx) => ({
-  id: idx,
-  title: idx % 2 === 0 ? '밀키스 유럽 진단' : '핫식스 유럽 진단',
-  filename: idx % 3 === 0 ? '21 CFR 101.7.pdf' : 'logo.png',
-  size: idx % 3 === 0 ? '60.98KB' : '227.68KB',
-  date: '2025-12-04',
-}));
-
-const cards = Array.from({ length: 18 }).map((_, idx) => ({
-  id: idx,
-  title: idx % 2 === 0 ? '밀키스 유럽 진단' : '핫식스 유럽 진단',
-  body:
-    '보고서 샘플 문장 붙을 자리입니다보고서 샘플 문장 붙을 자리입니다보고서 샘플 문장 붙을 자리입니다보고서 샘플 문장 붙을 자리입니다',
-  date: '2025-12-04',
-  country: idx % 3 === 0 ? '유럽' : idx % 3 === 1 ? '미국' : '일본',
-}));
-
-// 테이블 필터 상태
-const titleInput = ref('');
-const fileInput = ref('');
-const dateInput = ref('');
-const appliedTitle = ref('');
-const appliedFile = ref('');
-const appliedDate = ref('');
+const resetFilters = () => {
+  titleInput.value = "";
+  fileInput.value = "";
+  dateInput.value = "";
+  appliedTitle.value = "";
+  appliedFile.value = "";
+  appliedDate.value = "";
+};
 
 const applyTableFilters = () => {
   appliedTitle.value = titleInput.value.trim();
@@ -139,40 +134,39 @@ const applyTableFilters = () => {
 };
 
 const filteredRows = computed(() =>
-  tableRows.filter((row) => {
+  projects.value.filter((row) => {
     const matchTitle = appliedTitle.value
       ? row.title.toLowerCase().includes(appliedTitle.value.toLowerCase())
       : true;
     const matchFile = appliedFile.value
-      ? row.filename.toLowerCase().includes(appliedFile.value.toLowerCase())
+      ? (row.filename || "")
+          .toLowerCase()
+          .includes(appliedFile.value.toLowerCase())
       : true;
     const matchDate = appliedDate.value ? row.date === appliedDate.value : true;
     return matchTitle && matchFile && matchDate;
-  }),
+  })
 );
 
-// 카드 필터 상태
-const cardTitleInput = ref('');
-const cardDateInput = ref('');
-const countryInput = ref('');
-const appliedCardTitle = ref('');
-const appliedCardDate = ref('');
-const appliedCountry = ref('');
-
-const applyCardFilters = () => {
-  appliedCardTitle.value = cardTitleInput.value.trim();
-  appliedCardDate.value = cardDateInput.value;
-  appliedCountry.value = countryInput.value;
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  return new Date(dateString).toLocaleDateString("ko-KR");
 };
 
-const filteredCards = computed(() =>
-  cards.filter((card) => {
-    const matchTitle = appliedCardTitle.value
-      ? card.title.toLowerCase().includes(appliedCardTitle.value.toLowerCase())
-      : true;
-    const matchDate = appliedCardDate.value ? card.date === appliedCardDate.value : true;
-    const matchCountry = appliedCountry.value ? card.country === appliedCountry.value : true;
-    return matchTitle && matchDate && matchCountry;
-  }),
-);
+const viewProject = (id) => {
+  router.push({ path: "/results", query: { projectId: id } });
+};
+
+const deleteProject = async (id) => {
+  if (!confirm("정말 삭제하시겠습니까?")) return;
+
+  try {
+    await projectAPI.deleteProject(id);
+    alert("삭제되었습니다.");
+    await loadProjects();
+  } catch (error) {
+    console.error("삭제 실패:", error);
+    alert("삭제에 실패했습니다.");
+  }
+};
 </script>
