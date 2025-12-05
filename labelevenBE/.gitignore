@@ -9,7 +9,6 @@ uploads/
 
 # Gradle
 .gradle/
-gradle/
 
 # IDE
 .idea/
