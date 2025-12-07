@@ -12,8 +12,15 @@
     </aside>
     <section class="user-content">
       <div class="user-filters">
-        <label>제목 <input v-model="cardTitleInput" type="text" placeholder="제목을 입력하세요" /></label>
-        <label>수출국
+        <label
+          >제목
+          <input
+            v-model="cardTitleInput"
+            type="text"
+            placeholder="제목을 입력하세요"
+        /></label>
+        <label
+          >수출국
           <select v-model="countryInput">
             <option value="">선택</option>
             <option>유럽</option>
@@ -23,9 +30,14 @@
           </select>
         </label>
         <label>생성일자 <input v-model="cardDateInput" type="date" /></label>
-        <button class="primary-btn filter-btn" @click="applyCardFilters">검색</button>
+        <button class="primary-btn filter-btn" @click="applyCardFilters">
+          검색
+        </button>
       </div>
-      <div class="user-cards">
+      <div v-if="loading" style="text-align: center; padding: 40px">
+        <p>데이터를 불러오는 중...</p>
+      </div>
+      <div v-else class="user-cards">
         <div v-for="card in filteredCards" :key="card.id" class="user-card">
           <div class="card-title">{{ card.title }}</div>
           <div class="card-body">{{ card.body }}</div>
@@ -37,18 +49,21 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { reportAPI } from "../services/api";
 
 const router = useRouter();
+const loading = ref(true);
+const reports = ref([]);
 
 const tabs = [
-  { key: 'upload-list', label: '업로드한 데이터', route: '/user' },
-  { key: 'merge-report', label: '정합 보고서', route: '/user/merge' },
-  { key: 'final-report', label: '최종 보고서', route: '/user/final' },
+  { key: "upload-list", label: "업로드한 데이터", route: "/user" },
+  { key: "merge-report", label: "정합 보고서", route: "/user/merge" },
+  { key: "final-report", label: "최종 보고서", route: "/user/final" },
 ];
 
-const activeTab = ref('final-report');
+const activeTab = ref("final-report");
 
 const switchTab = (key) => {
   const tab = tabs.find((t) => t.key === key);
@@ -58,45 +73,64 @@ const switchTab = (key) => {
   resetFilters();
 };
 
-const cards = Array.from({ length: 18 }).map((_, idx) => ({
-  id: idx,
-  title: idx % 2 === 0 ? '최종 보고서 샘플' : '최종 보고서 유럽 진단',
-  body:
-    '최종 보고서 샘플 텍스트입니다. 실제 데이터로 교체될 예정입니다. 최종 보고서 샘플 텍스트입니다.',
-  date: '2025-12-04',
-  country: idx % 3 === 0 ? '유럽' : idx % 3 === 1 ? '미국' : '일본',
-}));
+const cardTitleInput = ref("");
+const cardDateInput = ref("");
+const countryInput = ref("");
+const appliedCardTitle = ref("");
+const appliedCardDate = ref("");
+const appliedCountry = ref("");
 
-const cardTitleInput = ref('');
-const cardDateInput = ref('');
-const countryInput = ref('');
-const appliedCardTitle = ref('');
-const appliedCardDate = ref('');
-const appliedCountry = ref('');
+onMounted(async () => {
+  try {
+    const response = await reportAPI.getReports("FINAL");
+    if (response.success) {
+      reports.value = response.data.items.map((item) => ({
+        id: item.id,
+        title: item.title || "최종 보고서",
+        body: item.content?.substring(0, 100) || "최종 보고서 내용",
+        date: new Date(item.createdAt)
+          .toISOString()
+          .split("T")[0]
+          .replace(/-/g, "."),
+        country: item.project?.country || "",
+      }));
+    }
+  } catch (error) {
+    console.error("최종 보고서 목록 로딩 실패:", error);
+  } finally {
+    loading.value = false;
+  }
+});
 
 const resetFilters = () => {
-  cardTitleInput.value = '';
-  cardDateInput.value = '';
-  countryInput.value = '';
-  appliedCardTitle.value = '';
-  appliedCardDate.value = '';
-  appliedCountry.value = '';
+  cardTitleInput.value = "";
+  cardDateInput.value = "";
+  countryInput.value = "";
+  appliedCardTitle.value = "";
+  appliedCardDate.value = "";
+  appliedCountry.value = "";
 };
 
 const applyCardFilters = () => {
   appliedCardTitle.value = cardTitleInput.value.trim();
-  appliedCardDate.value = cardDateInput.value;
+  appliedCardDate.value = cardDateInput.value
+    ? cardDateInput.value.replace(/-/g, ".")
+    : "";
   appliedCountry.value = countryInput.value;
 };
 
 const filteredCards = computed(() =>
-  cards.filter((card) => {
+  reports.value.filter((card) => {
     const matchTitle = appliedCardTitle.value
       ? card.title.toLowerCase().includes(appliedCardTitle.value.toLowerCase())
       : true;
-    const matchDate = appliedCardDate.value ? card.date === appliedCardDate.value : true;
-    const matchCountry = appliedCountry.value ? card.country === appliedCountry.value : true;
+    const matchDate = appliedCardDate.value
+      ? card.date === appliedCardDate.value
+      : true;
+    const matchCountry = appliedCountry.value
+      ? card.country === appliedCountry.value
+      : true;
     return matchTitle && matchDate && matchCountry;
-  }),
+  })
 );
 </script>
