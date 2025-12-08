@@ -25,27 +25,32 @@
           />
         </div>
         <div class="filter-actions">
-          <button class="primary-btn report-search-btn" @click="applyFilters">검색</button>
-          <button class="ghost-btn report-reset-btn" @click="resetFilters">초기화</button>
+          <button class="primary-btn report-search-btn" @click="applyFilters">
+            검색
+          </button>
+          <button class="ghost-btn report-reset-btn" @click="resetFilters">
+            초기화
+          </button>
         </div>
       </div>
-
       <div class="report-table-wrapper">
         <table class="report-table">
           <thead>
             <tr>
-              <th style="width: 40px;">X</th>
+              <th style="width: 40px">X</th>
               <th>제목</th>
               <th>정합된 보고서</th>
-              <th style="width: 90px;">용량</th>
+              <th style="width: 90px">용량</th>
               <th>최종 보고서</th>
-              <th style="width: 90px;">용량</th>
-              <th style="width: 110px;">생성 일자</th>
+              <th style="width: 90px">용량</th>
+              <th style="width: 110px">생성 일자</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="row in filteredRows" :key="row.id">
-              <td class="cell-center delete-cell" @click="removeRow(row.id)">X</td>
+              <td class="cell-center delete-cell" @click="removeRow(row.id)">
+                X
+              </td>
               <td>{{ row.title }}</td>
               <td>{{ row.mergeReport }}</td>
               <td class="cell-center">{{ row.mergeSize }}</td>
@@ -54,7 +59,9 @@
               <td class="cell-center">{{ row.date }}</td>
             </tr>
             <tr v-if="!filteredRows.length">
-              <td colspan="7" class="cell-center empty-cell">검색 결과가 없습니다.</td>
+              <td colspan="7" class="cell-center empty-cell">
+                검색 결과가 없습니다.
+              </td>
             </tr>
           </tbody>
         </table>
@@ -62,67 +69,42 @@
     </section>
   </div>
 </template>
-
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from "vue";
+import { projectAPI } from "../services/api";
 
-const rows = ref([
-  {
-    id: 1,
-    title: '밀키스 유럽 규격 변환',
-    mergeReport: '밀키스 유럽 규격 변환_정합본',
-    mergeSize: '60.98KB',
-    finalReport: '밀키스 유럽 규격 변환_최종본',
-    finalSize: '160.98KB',
-    date: '2025.12.01',
-  },
-  {
-    id: 2,
-    title: '밀키스 미국 규격 변환',
-    mergeReport: '밀키스 미국 규격 변환_정합본',
-    mergeSize: '60.98KB',
-    finalReport: '밀키스 미국 규격 변환_최종본',
-    finalSize: '160.98KB',
-    date: '2025.12.01',
-  },
-  {
-    id: 3,
-    title: '밀키스 일본 규격 변환',
-    mergeReport: '밀키스 일본 규격 변환_정합본',
-    mergeSize: '60.98KB',
-    finalReport: '밀키스 일본 규격 변환_최종본',
-    finalSize: '160.98KB',
-    date: '2025.12.01',
-  },
-  {
-    id: 4,
-    title: '밀키스 인도 규격 변환',
-    mergeReport: '밀키스 인도 규격 변환_정합본',
-    mergeSize: '60.98KB',
-    finalReport: '밀키스 인도 규격 변환_최종본',
-    finalSize: '160.98KB',
-    date: '2025.12.01',
-  },
-  // 더미 데이터 추가
-  ...Array.from({ length: 12 }).map((_, idx) => ({
-    id: 5 + idx,
-    title: idx % 2 === 0 ? '밀키스 유럽 규격 변환' : '밀키스 미국 규격 변환',
-    mergeReport: idx % 2 === 0 ? '밀키스 유럽 규격 변환_정합본' : '밀키스 미국 규격 변환_정합본',
-    mergeSize: '60.98KB',
-    finalReport: idx % 2 === 0 ? '밀키스 유럽 규격 변환_최종본' : '밀키스 미국 규격 변환_최종본',
-    finalSize: '160.98KB',
-    date: '2025.12.01',
-  })),
-]);
+const rows = ref([]);
 
-const titleInput = ref('');
-const dateInput = ref('2025-12-04');
-const appliedTitle = ref('');
-const appliedDate = ref('');
+const titleInput = ref("");
+const dateInput = ref("");
+const appliedTitle = ref("");
+const appliedDate = ref("");
+
+onMounted(async () => {
+  try {
+    const response = await projectAPI.getProjects();
+    if (response.success && response.data.projects) {
+      rows.value = response.data.projects.map((project) => ({
+        id: project.id,
+        title: project.title || "제목 없음",
+        mergeReport: `${project.title || "프로젝트"}_정합본`,
+        mergeSize: "60.98KB",
+        finalReport: `${project.title || "프로젝트"}_최종본`,
+        finalSize: "160.98KB",
+        date: new Date(project.createdAt)
+          .toISOString()
+          .split("T")[0]
+          .replace(/-/g, "."),
+      }));
+    }
+  } catch (error) {
+    console.error("프로젝트 목록 조회 실패:", error);
+  }
+});
 
 const applyFilters = () => {
   appliedTitle.value = titleInput.value.trim();
-  appliedDate.value = dateInput.value ? dateInput.value.replace(/-/g, '.') : '';
+  appliedDate.value = dateInput.value ? dateInput.value.replace(/-/g, ".") : "";
 };
 
 const filteredRows = computed(() =>
@@ -132,17 +114,25 @@ const filteredRows = computed(() =>
       : true;
     const matchDate = appliedDate.value ? row.date === appliedDate.value : true;
     return matchTitle && matchDate;
-  }),
+  })
 );
 
 const resetFilters = () => {
-  titleInput.value = '';
-  dateInput.value = '';
-  appliedTitle.value = '';
-  appliedDate.value = '';
+  titleInput.value = "";
+  dateInput.value = "";
+  appliedTitle.value = "";
+  appliedDate.value = "";
 };
 
-const removeRow = (id) => {
-  rows.value = rows.value.filter((row) => row.id !== id);
+const removeRow = async (id) => {
+  if (!confirm("정말로 이 프로젝트를 삭제하시겠습니까?")) return;
+
+  try {
+    await projectAPI.deleteProject(id);
+    rows.value = rows.value.filter((row) => row.id !== id);
+  } catch (error) {
+    console.error("프로젝트 삭제 실패:", error);
+    alert("프로젝트 삭제에 실패했습니다.");
+  }
 };
 </script>

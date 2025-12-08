@@ -55,7 +55,7 @@ import { reportAPI } from "../services/api";
 
 const router = useRouter();
 const loading = ref(true);
-const reports = ref([]);
+const cards = ref([]);
 
 const tabs = [
   { key: "upload-list", label: "업로드한 데이터", route: "/user" },
@@ -80,19 +80,20 @@ const appliedCardTitle = ref("");
 const appliedCardDate = ref("");
 const appliedCountry = ref("");
 
+// API에서 정합 보고서 목록 가져오기
 onMounted(async () => {
   try {
     const response = await reportAPI.getReports("MERGE");
-    if (response.success) {
-      reports.value = response.data.items.map((item) => ({
+    if (response.success && response.data.reports) {
+      cards.value = response.data.reports.map((item) => ({
         id: item.id,
-        title: item.title || "정합 보고서",
-        body: item.content?.substring(0, 100) || "정합 보고서 내용",
+        title: item.projectTitle || "정합 보고서",
+        body: item.summary?.substring(0, 100) || "정합 보고서 내용",
         date: new Date(item.createdAt)
           .toISOString()
           .split("T")[0]
           .replace(/-/g, "."),
-        country: item.project?.country || "",
+        country: item.country || "",
       }));
     }
   } catch (error) {
@@ -120,7 +121,7 @@ const applyCardFilters = () => {
 };
 
 const filteredCards = computed(() =>
-  reports.value.filter((card) => {
+  cards.value.filter((card) => {
     const matchTitle = appliedCardTitle.value
       ? card.title.toLowerCase().includes(appliedCardTitle.value.toLowerCase())
       : true;
