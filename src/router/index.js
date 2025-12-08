@@ -10,7 +10,7 @@ import MergeReportView from "../views/MergeReportView.vue";
 import FinalReportView from "../views/FinalReportView.vue";
 
 const routes = [
-  { path: "/", name: "upload", component: UploadView },
+  { path: "/", name: "login", component: LoginView },
   { path: "/review", name: "review", component: ReviewView },
   { path: "/results", name: "results", component: ResultsView },
   { path: "/report", name: "report", component: ReportView },
