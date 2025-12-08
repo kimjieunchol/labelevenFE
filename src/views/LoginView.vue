@@ -63,7 +63,7 @@ const handleLogin = async () => {
 
     if (response.success) {
       localStorage.setItem("token", response.data.token);
-      router.push("/");
+      router.push("/upload");
     } else {
       errorMessage.value = response.message || "로그인에 실패했습니다.";
     }
